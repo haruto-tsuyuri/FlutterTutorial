@@ -52,4 +52,6 @@ class MyApp extends StatelessWidget {
       ),
     );
   }
+
+  Column _buildButtonColumn(Color color, IconData icon, String label) {}
 }
