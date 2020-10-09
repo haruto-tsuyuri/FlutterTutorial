@@ -115,15 +115,21 @@ class MyApp extends StatelessWidget {
   }
 }
 
+///　いいね機能の実装のためのStatefulWidgetを継承したクラス
 class FavoriteWidget extends StatefulWidget {
   @override
   _FavoriteWidgetState createState() => _FavoriteWidgetState();
 }
 
+/// いいねWidgetの状態を操作するためのクラス
 class _FavoriteWidgetState extends State<FavoriteWidget> {
+  // いいね押下の状態　Default : false
   bool _isFavorited = false;
+
+  // 押されたいいねの数 Default : 0
   int _favoriteCount = 0;
-// ···
+
+  // [_isFavorited]の値によって[_favoriteCount]と[_isFavorited]の値を変える
   void _toggleFavorite() {
     setState(() {
       if (_isFavorited) {
