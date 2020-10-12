@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 // Uncomment lines 7 and 10 to view the visual layout at runtime.
@@ -135,6 +136,13 @@ class MyApp extends StatelessWidget {
             buttonSection,
             textSection,
             TapboxA(),
+            AutoSizeText(
+              'test long String,test long Stringtest lo,',
+              style: TextStyle(fontSize: 30),
+              minFontSize: 18,
+              maxLines: 4,
+              overflow: TextOverflow.ellipsis,
+            ),
           ],
         ),
       ),
