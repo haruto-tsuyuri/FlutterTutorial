@@ -8,162 +8,128 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  static const String _title = 'Flutter Code Sample';
+
   @override
   Widget build(BuildContext context) {
-    Widget titleSection = Container(
-      padding: const EdgeInsets.all(32),
-      child: Row(
-        children: [
-          Expanded(
-            /*1*/
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                /*2*/
-                Container(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Text(
-                    'Oeschinen Lake Campground',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                Text(
-                  'Kandersteg, Switzerland',
-                  style: TextStyle(
-                    color: Colors.grey[500],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          /*3*/
-          FavoriteWidget(),
-        ],
-      ),
-    );
-
-    Color color = Theme.of(context).primaryColor;
-
-    Widget buttonSection = Container(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildButtonColumn(color, Icons.call, 'CALL'),
-          _buildButtonColumn(color, Icons.near_me, 'ROUTE'),
-          _buildButtonColumn(color, Icons.share, 'SHARE'),
-        ],
-      ),
-    );
-
-    Widget textSection = Container(
-      padding: const EdgeInsets.all(32),
-      child: Text(
-        'Lake Oeschinen lies at the foot of the Blüemlisalp in the Bernese '
-        'Alps. Situated 1,578 meters above sea level, it is one of the '
-        'larger Alpine Lakes. A gondola ride from Kandersteg, followed by a '
-        'half-hour walk through pastures and pine forest, leads you to the '
-        'lake, which warms to 20 degrees Celsius in the summer. Activities '
-        'enjoyed here include rowing, and riding the summer toboggan run.',
-        softWrap: true,
-      ),
-    );
-
     return MaterialApp(
-      title: 'Flutter layout demo',
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Flutter layout demo'),
-        ),
-        body: ListView(
-          children: [
-            Image.asset(
-              'images/lake.jpg',
-              width: 600,
-              height: 240,
-              fit: BoxFit.cover,
-            ),
-            titleSection,
-            buttonSection,
-            textSection,
-          ],
-        ),
-      ),
-    );
-  }
-
-  Column _buildButtonColumn(Color color, IconData icon, String label) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(icon, color: color),
-        Container(
-          margin: const EdgeInsets.only(top: 8),
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
-              color: color,
-            ),
-          ),
-        ),
-      ],
+      title: _title,
+      home: HomePage(),
     );
   }
 }
 
-///　いいね機能の実装のためのStatefulWidgetを継承したクラス
-class FavoriteWidget extends StatefulWidget {
+class HomePage extends StatefulWidget {
   @override
-  _FavoriteWidgetState createState() => _FavoriteWidgetState();
+  _HomePageState createState() => _HomePageState();
 }
 
-/// いいねWidgetの状態を操作するためのクラス
-class _FavoriteWidgetState extends State<FavoriteWidget> {
-  // いいね押下の状態　Default : false
-  bool _isFavorited = false;
+class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0;
+  PageController _pageController;
 
-  // 押されたいいねの数 Default : 0
-  int _favoriteCount = 0;
+  static List<Widget> _pageList = [
+    CustomPage(pannelColor: Colors.cyan, title: 'Home'),
+    CustomPage(pannelColor: Colors.green, title: 'Settings'),
+    CustomPage(pannelColor: Colors.pink, title: 'Search')
+  ];
 
-  // [_isFavorited]の値によって[_favoriteCount]と[_isFavorited]の値を変える
-  void _toggleFavorite() {
+  void _onPageChanged(int index) {
     setState(() {
-      if (_isFavorited) {
-        _favoriteCount -= 1;
-        _isFavorited = false;
-      } else {
-        _favoriteCount += 1;
-        _isFavorited = true;
-      }
+      _selectedIndex = index;
     });
   }
 
   @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(
+      initialPage: _selectedIndex,
+    );
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          padding: EdgeInsets.all(0),
-          child: IconButton(
-            padding: EdgeInsets.all(0),
-            alignment: Alignment.centerRight,
-            icon: (_isFavorited ? Icon(Icons.star) : Icon(Icons.star_border)),
-            color: Colors.red[500],
-            onPressed: _toggleFavorite,
+    return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        title: const Text(
+          '画面分割例',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.black54,
+        shape: ContinuousRectangleBorder(
+          borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(30),
+              bottomRight: Radius.circular(30)),
+        ),
+      ),
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: _onPageChanged,
+        children: _pageList,
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            title: Text('Home'),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            title: Text('Setting'),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            title: Text('Search'),
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        onTap: (index) {
+          _selectedIndex = index;
+
+          _pageController.animateToPage(index,
+              duration: Duration(milliseconds: 300), curve: Curves.easeIn);
+        },
+      ),
+    );
+  }
+}
+
+class CustomPage extends StatelessWidget {
+  final Color pannelColor;
+  final String title;
+
+  CustomPage({@required this.pannelColor, @required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    final titleTextStyle = Theme.of(context).textTheme.title;
+    return Container(
+      child: Center(
+        child: Container(
+          width: 200,
+          height: 200,
+          decoration: BoxDecoration(
+              color: pannelColor,
+              borderRadius: BorderRadius.all(Radius.circular(20.0))),
+          child: Center(
+            child: Text(
+              title,
+              style: TextStyle(
+                fontSize: titleTextStyle.fontSize,
+                color: titleTextStyle.color,
+              ),
+            ),
           ),
         ),
-        SizedBox(
-          width: 18,
-          child: Container(
-            child: Text('$_favoriteCount'),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
