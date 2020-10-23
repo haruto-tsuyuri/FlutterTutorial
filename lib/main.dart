@@ -24,6 +24,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
+  PageController _pageController;
   static List<Widget> _pageList = [
     CustomPage(
         pannelColor: Colors.blueAccent, title: 'Home', icon: Icon(Icons.home)),
@@ -37,10 +38,30 @@ class _HomePageState extends State<HomePage> {
         icon: Icon(Icons.settings)),
   ];
 
-  void _onItemTapped(int index) {
+  void _onPageChanged(int index) {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  // void _onItemTapped(int index) {
+  //   setState(() {
+  //     _selectedIndex = index;
+  //   });
+  // }
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(
+      initialPage: _selectedIndex,
+    );
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -50,7 +71,11 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text('navi'),
       ),
-      body: _pageList[_selectedIndex],
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: _onPageChanged,
+        children: _pageList,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -67,9 +92,16 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
         currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+        // onTap: _onItemTapped,
+
+        onTap: (index) {
+          _selectedIndex = index;
+          //スライド時とタブ時の動作を同じくする
+          _pageController.animateToPage(index,
+              duration: Duration(milliseconds: 300), curve: Curves.easeIn);
+        },
         type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.orangeAccent,
+        backgroundColor: Colors.black,
         // fixedColor: Colors.blueAccent,
         selectedItemColor: Colors.lightBlueAccent,
         unselectedItemColor: Colors.white,
